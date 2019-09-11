@@ -23,6 +23,7 @@ import com.firebase.geofire.GeoQuery;
 import com.firebase.geofire.GeoQueryEventListener;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -33,6 +34,11 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.net.PlacesClient;
+import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
+import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -40,6 +46,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -57,6 +64,10 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
 
     private Boolean requestBol = false;
     private Marker pickupMarker;
+
+    // private String placesApiKey;
+    // PlacesClient placesClient;
+    private String destination = "";
 
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
 
@@ -97,7 +108,7 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
                     driverLocationRef.removeEventListener(driverLocationRefListener);
 
                     if (driverFoundID != null) {
-                        DatabaseReference driverRef = FirebaseDatabase.getInstance().getReference().child("Users").child("Drivers").child(driverFoundID);
+                        DatabaseReference driverRef = FirebaseDatabase.getInstance().getReference().child("Users").child("Drivers").child(driverFoundID).child("customerRequest");
                         driverRef.setValue(true);
                         driverFoundID = null;
                     }
@@ -142,6 +153,38 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
                 return;
             }
         });
+
+        String placesApiKey = getString(R.string.places_api_key);
+        if (!Places.isInitialized()) {
+            Places.initialize(getApplicationContext(), placesApiKey);
+        }
+
+// Create a new Places client instance.
+        // placesClient = Places.createClient(this);
+
+        // Initialize the AutocompleteSupportFragment.
+        AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment)
+                getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
+
+        // Specify the types of place data to return.
+        autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME));
+
+        // Set up a PlaceSelectionListener to handle the response.
+        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+            @Override
+            public void onPlaceSelected(Place place) {
+                // TODO: Get info about the selected place.
+                destination = place.getName().toString();
+                // Log.i(TAG, "Place: " + place.getName() + ", " + place.getId());
+            }
+
+            @Override
+            public void onError(Status status) {
+                // TODO: Handle the error.
+                // Log.i(TAG, "An error occurred: " + status);
+            }
+        });
+
     }
 
     private int radius = 1;
@@ -163,10 +206,11 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
                    driverFoundID = key;
                     // mRequest.setText("A driver has been found. ID:"+driverFoundID);
 
-                    DatabaseReference driverRef = FirebaseDatabase.getInstance().getReference().child("Users").child("Drivers").child(driverFoundID);
+                    DatabaseReference driverRef = FirebaseDatabase.getInstance().getReference().child("Users").child("Drivers").child(driverFoundID).child("customerRequest");
                     String customerId = FirebaseAuth.getInstance().getCurrentUser().getUid();
                     HashMap map = new HashMap();
                     map.put("customerRideId", customerId);
+                    map.put("destination", destination);
                     driverRef.updateChildren(map);
 
                     getDriverLocation();
