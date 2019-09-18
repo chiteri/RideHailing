@@ -250,7 +250,9 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
     }
 
     private void getRouteMarker(LatLng pickupLatLng) {
+        String placesApiKey = getString(R.string.places_api_key);
         Routing routing = new Routing.Builder()
+                .key(placesApiKey)
                 .travelMode(AbstractRouting.TravelMode.DRIVING)
                 .withListener(this)
                 .alternativeRoutes(false)
