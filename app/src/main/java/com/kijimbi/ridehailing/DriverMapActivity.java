@@ -56,6 +56,7 @@ import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.EventListener;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -112,6 +113,7 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
                         mRideStatus.setText("Ride completed");
                         break;
                     case 2: // Driver on the way to destination with customer
+                        recordRide();
                         endRide();
                         break;
                 }
@@ -310,6 +312,23 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
         mCustomerPhone.setText("");
         mCustomerProfileImage.setImageResource(R.mipmap.ic_default_user);
         mCustomerDestination.setText("Destination -- ");
+
+    }
+
+    private void recordRide() {
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        DatabaseReference driverRef = FirebaseDatabase.getInstance().getReference().child("Users").child("Drivers").child(userId).child("history");
+        DatabaseReference customerRef = FirebaseDatabase.getInstance().getReference().child("Users").child("Customers").child(customerId).child("history");
+        DatabaseReference historyRef = FirebaseDatabase.getInstance().getReference().child("History");
+
+        String requestId = historyRef.push().getKey();
+        driverRef.child(requestId).setValue(true);
+        customerRef.child(requestId).setValue(true);
+
+        HashMap map = new HashMap();
+        map.put("driver", userId);
+        map.put("customer", customerId);
+        historyRef.child(requestId).updateChildren(map);
 
     }
 
