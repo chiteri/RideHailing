@@ -16,8 +16,11 @@ import com.google.firebase.database.ValueEventListener;
 import com.kijimbi.ridehailing.historyRecyclerView.HistoryAdapter;
 import com.kijimbi.ridehailing.historyRecyclerView.HistoryObject;
 
+import android.text.format.DateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
 public class HistoryActivity extends AppCompatActivity {
 
@@ -70,7 +73,15 @@ public class HistoryActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()){
                     String rideId = dataSnapshot.getKey();
-                    HistoryObject obj = new HistoryObject(rideId);
+                    Long timestamp = 0L;
+
+                    for (DataSnapshot child : dataSnapshot.getChildren()){
+                        if (child.getKey().equals("timestamp")){
+                            timestamp = Long.valueOf(child.getValue().toString());
+                        }
+                    }
+
+                    HistoryObject obj = new HistoryObject(rideId, getDate(timestamp));
                     resultsHistory.add(obj);
                     mHistoryAdapter.notifyDataSetChanged();
                 }
@@ -81,6 +92,14 @@ public class HistoryActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    private String getDate(Long timestamp) {
+        Calendar calendar = Calendar.getInstance(Locale.getDefault());
+        calendar.setTimeInMillis(timestamp * 1000);
+
+        String date = DateFormat.format("MM-dd-yyyy hh:mm", calendar).toString();
+        return date;
     }
 
     private ArrayList resultsHistory = new ArrayList<HistoryObject>();
