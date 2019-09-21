@@ -17,21 +17,35 @@
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
-        <Button
-            android:id="@+id/logout"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Logout" />
+            android:id="@+id/buttons">
+            <Button
+                android:id="@+id/logout"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Logout" />
 
-        <Button
-            android:layout_alignParentRight="true"
-            android:layout_gravity="right"
-            android:id="@+id/settings"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Settings" />
+            <Button
+                android:id="@+id/history"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Hisitory" />
+
+            <Button
+                android:id="@+id/settings"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Settings" />
+
+        </LinearLayout>
+
         <androidx.cardview.widget.CardView
-            android:layout_below="@+id/settings"
+            android:layout_below="@+id/buttons"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="20sp">

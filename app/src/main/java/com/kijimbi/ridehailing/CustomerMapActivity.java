@@ -63,7 +63,7 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
     private Location mLastLocation;
     private LocationRequest mLocationRequest;
 
-    private Button mLogout, mRequest, mSettings;
+    private Button mLogout, mRequest, mHistory, mSettings;
     private Boolean isLoggingOut = false;
     private LatLng pickupLocation;
 
@@ -94,6 +94,7 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
 
         mLogout = (Button) findViewById(R.id.logout);
         mRequest = (Button) findViewById(R.id.request);
+        mHistory = (Button) findViewById(R.id.history);
         mSettings = (Button) findViewById(R.id.settings);
 
         mDriverInfo = (LinearLayout) findViewById(R.id.driverInfo);
@@ -138,6 +139,15 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
                     getClosestDriver();
                 }
 
+            }
+        });
+
+        mHistory.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(CustomerMapActivity.this, HistoryActivity.class);
+                startActivity(intent);
+                return;
             }
         });
 
