@@ -146,6 +146,7 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(CustomerMapActivity.this, HistoryActivity.class);
+                intent.putExtra("CustomerOrDriver", "Customers");
                 startActivity(intent);
                 return;
             }
